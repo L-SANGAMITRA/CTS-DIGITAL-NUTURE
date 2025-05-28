@@ -1,0 +1,174 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Community Event Portal</title>
+  <style>
+    .event-card { border: 1px solid #ccc; padding: 1em; margin: 1em 0; }
+    .hidden { display: none; }
+    .error { color: red; }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body onload="pageLoaded()">
+  <h1>Upcoming Community Events</h1>
+  <div>
+    <label for="categoryFilter">Filter by Category:</label>
+    <select id="categoryFilter" onchange="handleFilter()">
+      <option value="all">All</option>
+      <option value="Music">Music</option>
+      <option value="Art">Art</option>
+      <option value="Tech">Tech</option>
+    </select>
+    <input id="searchBox" placeholder="Search by name" onkeydown="handleSearch(event)"/>
+  </div>
+  <div id="events"></div>  <form id="registrationForm">
+    <h2>Register for an Event</h2>
+    <input name="name" placeholder="Your Name" required />
+    <input name="email" placeholder="Your Email" required />
+    <select name="eventId" id="eventSelect"></select>
+    <button type="submit" id="registerBtn">Register</button>
+    <p class="error" id="formError"></p>
+  </form>  <div id="status"></div>  <script>
+    console.log("Welcome to the Community Portal");
+
+    function pageLoaded() {
+      alert("Page fully loaded!");
+    }
+
+    let totalRegistrationsByCategory = {};
+
+    class Event {
+      constructor(id, name, date, category, seats) {
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.category = category;
+        this.seats = seats;
+      }
+      checkAvailability() {
+        return this.seats > 0;
+      }
+    }
+
+    const events = [
+      new Event(1, "Music Fest", "2025-06-10", "Music", 20),
+      new Event(2, "Art Workshop", "2025-05-25", "Art", 0),
+      new Event(3, "Coding Bootcamp", "2025-07-15", "Tech", 15),
+    ];
+
+    function addEvent(event) {
+      events.push(event);
+    }
+
+    function filterEventsByCategory(category, callback) {
+      const filtered = events.filter(e => category === 'all' || e.category === category);
+      callback(filtered);
+    }
+
+    function renderEvents(eventList) {
+      const container = document.getElementById("events");
+      container.innerHTML = "";
+      const today = new Date().toISOString().split("T")[0];
+      eventList.forEach(evt => {
+        if (evt.date > today && evt.checkAvailability()) {
+          const card = document.createElement("div");
+          card.className = "event-card";
+          container.appendChild(card);
+        }
+      });
+    }
+
+    function populateSelect() {
+      const select = document.getElementById("eventSelect");
+      select.innerHTML = "";
+      events.forEach(evt => {
+        if (evt.checkAvailability()) {
+          const option = document.createElement("option");
+          option.value = evt.id;
+          option.textContent = evt.name;
+          select.appendChild(option);
+        }
+      });
+    }
+
+    document.getElementById("registrationForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const name = form.elements.name.value;
+      const email = form.elements.email.value;
+      const eventId = parseInt(form.elements.eventId.value);
+
+      if (!name || !email || !eventId) {
+        document.getElementById("formError").textContent = "All fields are required!";
+        return;
+      }
+
+      document.getElementById("formError").textContent = "";
+
+      try {
+        const res = await fakePost({ name, email, eventId });
+        alert("Registration successful!");
+        const evt = events.find(e => e.id === eventId);
+        evt.seats--;
+        totalRegistrationsByCategory[evt.category] = (totalRegistrationsByCategory[evt.category] || 0) + 1;
+        renderEvents(events);
+        populateSelect();
+      } catch (err) {
+        alert("Registration failed!");
+      }
+    });
+
+    function fakePost(data) {
+      return new Promise((resolve) => {
+        console.log("Sending data:", data);
+        setTimeout(() => {
+          resolve({ status: "ok" });
+        }, 1000);
+      });
+    }
+
+    function handleFilter() {
+      const category = document.getElementById("categoryFilter").value;
+      filterEventsByCategory(category, renderEvents);
+    }
+
+    function handleSearch(event) {
+      if (event.key === "Enter") {
+        const query = event.target.value.toLowerCase();
+        const filtered = events.filter(e => e.name.toLowerCase().includes(query));
+        renderEvents(filtered);
+      }
+    }
+
+    // Async Fetch (Mock)
+    async function fetchEvents() {
+      document.getElementById("status").textContent = "Loading events...";
+      return new Promise(resolve => {
+        setTimeout(() => {
+          document.getElementById("status").textContent = "";
+          resolve(events);
+        }, 1000);
+      });
+    }
+
+    fetchEvents().then(data => {
+      renderEvents(data);
+      populateSelect();
+    }).catch(() => {
+      document.getElementById("status").textContent = "Failed to load events.";
+    });
+
+    // jQuery for fadeIn/fadeOut and register click
+    $(document).ready(function() {
+      $("#registerBtn").click(function() {
+        $("#status").fadeIn().text("Submitting...").delay(1000).fadeOut();
+      });
+    });
+
+    // Log object keys and values
+    events.forEach(e => console.log(Object.entries(e)));
+
+    // Show benefit of frameworks
+    console.log("React/Vue help manage UI state and structure large apps efficiently.");
+  </script></body>
+</html>
