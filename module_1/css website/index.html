@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community Event Portal</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #eef2f3; }
+    header, nav, main, footer { padding: 20px; }
+    header { background: #e738c4; color: rgb(9, 9, 9); text-align: center; }
+    nav { background: #b60c78; color: rgb(8, 8, 8); display: flex; gap: 20px; }
+    nav a { color: rgb(8, 8, 8); text-decoration: none; }
+    .welcome { margin: 20px 0; font-size: 1.5em; color: #333; }
+    .gallery img { width: 150px; height: 100px; margin: 5px; border-radius: 5px; }
+    .form-section { background: white; padding: 15px; border-radius: 5px; margin-top: 20px; }
+    .form-section input, .form-section textarea, .form-section button { width: 100%; padding: 10px; margin: 10px 0; }
+    video { width: 100%; margin-top: 20px; }
+    #map { height: 300px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Community Events Portal</h1>
+  </header>
+
+  <nav>
+    <a href="#welcome">Welcome</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#register">Register</a>
+    <a href="#feedback">Feedback</a>
+    <a href="#video">Invite Video</a>
+    <a href="#map">Event Map</a>
+  </nav>
+
+  <main>
+    <section id="welcome" class="welcome">
+      <p>Welcome to your new community hub—where ideas spark, connections grow, and everyone belongs!!!</p>
+    </section>
+
+    <section id="gallery" class="gallery">
+      <h2>Event Spotlights</h2>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTOfVGo2ShBW9ybPyikRE9xQjvGtZVSRQOSg&s" alt="Event 1" />
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAW0xKWdlJdCpUf1VlnJqkvq-W9qV4IPXzxA&s" alt="Event 2" />
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT73zmNg4-Xzce7-rii7cCpvM5ZkuS8mcSYmA&s" alt="Event 3" />
+      <img src="https://www.drikpanchang.com/images/events/vrats/400x400/xvinayaka_chaturthi.jpg.pagespeed.ic.IwUHiFVGQD.jpg" alt="Event 4" />
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8YNkTopILjWiGDbHghGfkk9n56tOpKumaTg&s" alt="Event 5" />
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTg3m9HMarlHZDkUzibP_crqLxKoYq281KHFQ&s" alt="Event 6" />
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr0mkU7xpinHFPgnLCdaCW9MLiWaNJ5NTKPQ&s" alt="Event 7" />
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuUkpj4fmDEeEt6kYxc_myr-AOoIRbZJxBaw&s" alt="Event 8" />
+      <img src="https://static.toiimg.com/thumb/msid-116800481,width-1280,height-720,resizemode-4/116800481.jpg" alt="Event 9" />
+    </section>
+
+    <section id="register" class="form-section">
+      <h2>Event Registration</h2>
+      <form id="registrationForm">
+        <input type="text" id="regName" placeholder="Your Name" required />
+        <input type="email" id="regEmail" placeholder="Your Email" required />
+        <button type="submit">Register</button>
+      </form>
+    </section>
+
+    <section id="feedback" class="form-section">
+      <h2>Event Feedback</h2>
+      <form id="feedbackForm">
+        <textarea id="feedbackText" placeholder="Your Feedback" rows="4" required></textarea>
+        <button type="submit">Submit Feedback</button>
+      </form>
+    </section>
+
+    <section id="video">
+      <h2>Video Invitation</h2>
+      <video id="inviteVideo" controls>
+        <source src="855431-hd_1920_1080_24fps.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </section>
+
+    <section id="map">
+      <h2>Event Location</h2>
+      <div id="map"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Community Events</p>
+  </footer>
+
+  <script>
+    // Event Handling
+    document.getElementById("registrationForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("regName").value;
+      localStorage.setItem("userName", name);
+      alert(`Thanks for registering, ${name}!`);
+    });
+
+    document.getElementById("feedbackForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const feedback = document.getElementById("feedbackText").value;
+      console.log("Feedback Received:", feedback);
+      alert("Thank you for your feedback!");
+    });
+
+    const video = document.getElementById("inviteVideo");
+    video.addEventListener("play", () => console.log("Video started"));
+    video.addEventListener("pause", () => console.log("Video paused"));
+
+    // Geolocation
+    function initMap() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const mapFrame = document.createElement('iframe');
+          mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+          mapFrame.width = "100%";
+          mapFrame.height = "300";
+          mapFrame.style.border = 0;
+          document.getElementById("map").appendChild(mapFrame);
+        }, () => alert("Geolocation failed"));
+      } else {
+        alert("Geolocation not supported by this browser.");
+      }
+    }
+
+    window.onload = initMap;
+  </script>
+</body>
+</html>
